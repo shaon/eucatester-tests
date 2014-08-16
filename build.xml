@@ -1,0 +1,101 @@
+<project name="eucatestertests" basedir="." default="build" xmlns:ivy="antlib:org.apache.ivy.ant">
+
+    <property name="src.dir" value="src" />
+    <property name="build.dir" value="build" />
+    <property name="libs.dir" value="lib" />
+    <property name="classes.dir" value="${build.dir}/classes" />
+    <property name="out.dir" value="out" />
+
+    <property name="log4j-jar" value="${libs.dir}/log4j.jar"/>
+
+    <!-- set classpath to include dependencies and build output -->
+    <path id="classpath">
+        <fileset dir="${libs.dir}">
+            <include name="*.jar"/>
+        </fileset>
+        <pathelement path="${classes.dir}" />
+    </path>
+
+    <!-- install ivy -->
+    <property name="ivy.install.version" value="2.3.0" />
+    <condition property="ivy.home" value="${env.IVY_HOME}">
+        <isset property="env.IVY_HOME" />
+    </condition>
+    <property name="ivy.home" value="${user.home}/.ant" />
+    <property name="ivy.jar.dir" value="${ivy.home}/lib" />
+    <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
+
+    <!-- custom jars -->
+    <property name="YouAre" value="https://github.com/tbeckham/you-are-sdk/releases/download/alpha2/YouAreSDK.jar" />
+    <property name="eucatester" value="https://drone.io/github.com/shaon/eucatester/files/build/jar/eutester-java-tdk-jar-1.0.0.jar" />
+    <property name="eucatester-source" value="https://drone.io/github.com/shaon/eucatester/files/build/jar/eutester-java-tdk-source-1.0.0.jar" />
+
+    <target name="download-ivy" unless="offline">
+
+        <mkdir dir="${ivy.jar.dir}"/>
+        <get src="http://repo2.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
+             dest="${ivy.jar.file}" usetimestamp="true"/>
+    </target>
+
+    <target name="download-custom-jars">
+
+    </target>
+
+    <target name="init-ivy" depends="download-ivy">
+        <path id="ivy.lib.path">
+            <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+
+        </path>
+        <taskdef resource="org/apache/ivy/ant/antlib.xml"
+                 uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+    </target>
+
+    <target name="resolve" depends="init-ivy" description="--> retreive dependencies with ivy">
+        <ivy:retrieve conf="default" pattern="${libs.dir}/[artifact]-[type]-[revision].[ext]"/>
+        <echo message="fetching YouAre SDk..."/>
+        <get src="${YouAre}" dest="${libs.dir}/YouAreSDK.jar" />
+        <echo message="fetching eucatester..."/>
+        <get src="${eucatester}" dest="${libs.dir}/eucatester-1.0.0.jar" />
+        <echo message="fetching eucatester-source..."/>
+        <get src="${eucatester-source}" dest="${libs.dir}/eucatester-source-1.0.0.jar" />
+    </target>
+
+    <target name="init" depends="resolve">
+        <mkdir dir="${libs.dir}" />
+        <mkdir dir="${ivy.jar.dir}"/>
+        <mkdir dir="${classes.dir}" />
+    </target>
+
+    <target name="install-deps" depends="init">
+
+    </target>
+
+    <target name="build" depends="install-deps">
+        <mkdir dir="${classes.dir}"/>
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath"/>
+        <copy file="log4j.properties" todir="${classes.dir}"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${classes.dir}"/>
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath"/>
+        <copy file="log4j.properties" todir="${classes.dir}"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${build.dir}" />
+        <delete dir="${out.dir}" />
+    </target>
+
+    <target name="clean-all">
+        <ivy:cleancache />
+        <delete dir="${build.dir}" />
+        <delete dir="${libs.dir}" />
+        <delete dir="${out.dir}" />
+    </target>
+
+    <target name="run">
+
+    </target>
+
+</project>

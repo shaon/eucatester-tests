@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="S3 Test Suite">
+  <test name="S3_Tests">
+    <classes>
+      <class name="com.testsuits.s3.S3BasicsTests" />
+      <class name="com.testsuits.s3.BucketVersioningTests" />
+    </classes>
+  </test>
+</suite>
